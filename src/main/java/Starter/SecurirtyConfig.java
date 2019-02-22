@@ -27,6 +27,11 @@ public class SecurirtyConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/protectedbyAdminRole*").hasRole(("Admin"))
                 .antMatchers("/nonprotected*").permitAll()
                 .and()
-                .httpBasic();
+                .httpBasic()
+                .and()
+                .logout()
+                .logoutUrl("/j_spring_security_logout")
+                .logoutSuccessUrl("/")
+        ;
     }
 }
