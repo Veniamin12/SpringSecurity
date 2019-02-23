@@ -7,16 +7,21 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurirtyConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private DataSource dataSource;
+
     @Autowired
     public void configurerglobal(AuthenticationManagerBuilder auth) throws java.lang.Exception {
-      auth.inMemoryAuthentication()
-      .withUser("devuser").password("{noop}dev").authorities("ROLE_USER")
-       .and()
-       .withUser("adminuser").password("{noop}admin").authorities("ROLE_USER","ROLE_ADMIN");
+     auth.jdbcAuthentication().dataSource(dataSource)
+             .passwordEncoder(new BCryptPasswordEncoder());
     }
     //@Authorization
     @Override
@@ -27,11 +32,7 @@ public class SecurirtyConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/protectedbyAdminRole*").hasRole(("Admin"))
                 .antMatchers("/nonprotected*").permitAll()
                 .and()
-                .httpBasic()
-                .and()
-                .logout()
-                .logoutUrl("/j_spring_security_logout")
-                .logoutSuccessUrl("/")
-        ;
+                .httpBasic();
+
     }
 }
